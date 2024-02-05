@@ -52,6 +52,7 @@ jobs:
       - name: Configuration Environment‌‌...
         run: |
           sudo apt-get install -y git wget git zip unzip curl axel
+          sudo apt install openjdk-11-jdk
 
       - name: Get the SGSI tool‌‌...
         run: |
