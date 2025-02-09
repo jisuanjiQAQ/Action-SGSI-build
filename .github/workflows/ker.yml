@@ -1,0 +1,48 @@
+name: Build Linux Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up build environment
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential libncurses-dev bison flex libssl-dev libelf-dev
+
+    - name: Download Linux kernel source
+      run: |
+        wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.1.tar.xz
+        tar -xf linux-5.10.1.tar.xz
+        cd linux-5.10.1
+
+    - name: Configure kernel
+      run: |
+        cd linux-5.10.1
+        make defconfig
+
+    - name: Build kernel
+      run: |
+        cd linux-5.10.1
+        make -j$(nproc)
+
+    - name: Package kernel
+      run: |
+        cd linux-5.10.1
+        tar -czf linux-kernel-5.10.1.tar.gz .
+
+    - name: Upload build artifact
+      uses: actions/upload-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        release_name: "Linux Kernel ${{ github.event.inputs.version }} - ${{ github.event.inputs.date }}"
+        body: "计算机qwq"
+        draft: false
+        prerelease: false
+        files: linux-5.10.1/linux-kernel-5.10.1.tar.gz
